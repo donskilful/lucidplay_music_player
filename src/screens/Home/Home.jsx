@@ -39,6 +39,23 @@ const Home = () => {
             maximumTrackTintColor="#fff"
             onSlidingComplete={() => {}}
           />
+          <View style={style.progressLevelDuration}>
+            <Text style={style.progressLevelText}>00:00</Text>
+            <Text style={style.progressLevelText}>00:00</Text>
+          </View>
+        </View>
+        <View style={style.musicControlsContainer}>
+          <TouchableOpacity onPress={() => {}}>
+            <Ionicons name="play-skip-back-outline" size={35} color="#ffd369" />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => {}}>
+            <Ionicons name="pause-circle" size={75} color="#ffd369" />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => {}}>
+            <Ionicons name="play-skip-back-outline" size={35} color="#ffd369" />
+          </TouchableOpacity>
         </View>
       </View>
       <View style={style.bottomContainer}>
@@ -123,5 +140,21 @@ const style = StyleSheet.create({
     height: 40,
     marginTop: 45,
     flexDirection: 'row',
+  },
+  progressLevelDuration: {
+    width: 340,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  progressLevelText: {
+    color: '#fff',
+    fontWeight: '500',
+  },
+  musicControlsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '60%',
+    marginTop: 15,
   },
 });

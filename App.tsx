@@ -1,10 +1,11 @@
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, StatusBar } from 'react-native';
 import React from 'react';
 import Home from './src/screens/Home/Home';
 
 const App = () => {
   return (
     <View style={style.container}>
+      <StatusBar barStyle={'light-content'} />
       <Home />
     </View>
   );

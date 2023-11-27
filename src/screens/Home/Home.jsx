@@ -34,14 +34,12 @@ const setUpPlayer = async () => {
   }
 };
 
-const togglePlayBack = async playBackState => {
-  const currentTrack = await TrackPlayer.getCurrentTrack();
-  if (currentTrack != null) {
-    if (playBackState === State.Paused) {
-      await TrackPlayer.play();
-    } else {
-      await TrackPlayer.pause();
-    }
+const togglePlayBack = async () => {
+  const state = await TrackPlayer.getState();
+  if (state === State.Playing) {
+    await TrackPlayer.pause();
+  } else {
+    await TrackPlayer.play();
   }
 };
 
@@ -102,7 +100,7 @@ const Home = () => {
             style={style.progressBar}
             value={10}
             minimumValue={0}
-            maximumValue={30}
+            maximumValue={35}
             thumbTintColor={'#ffd369'}
             minimumTrackTintColor="#ffd369"
             maximumTrackTintColor="#fff"

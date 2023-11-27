@@ -1,3 +1,4 @@
+import React, {useEffect, useState, useRef} from 'react';
 import {
   View,
   StyleSheet,
@@ -6,34 +7,102 @@ import {
   Dimensions,
   Image,
   Text,
+  Animated,
 } from 'react-native';
-import React from 'react';
+import TrackPlayer, {
+  Capability,
+  Event,
+  RepeatMode,
+  State,
+  usePlaybackState,
+  useProgress,
+  useTrackPlayerEvents,
+} from 'react-native-track-player';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Slider from '@react-native-community/slider';
+import songs from '../../model/Data';
 
 const {width} = Dimensions.get('screen');
 // const {width, height} = Dimensions.get('window');
 
+const setUpPlayer = async () => {
+  try {
+    await TrackPlayer.setupPlayer();
+    await TrackPlayer.add(songs);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const togglePlayBack = async playBackState => {
+  const currentTrack = await TrackPlayer.getCurrentTrack();
+  if (currentTrack != null) {
+    if (playBackState === State.Paused) {
+      await TrackPlayer.play();
+    } else {
+      await TrackPlayer.pause();
+    }
+  }
+};
+
 const Home = () => {
+  const playBackState = usePlaybackState();
+  const [songIndex, setSongIndex] = useState(0);
+  const scrollX = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    setUpPlayer();
+    scrollX.addListener(({value}) => {
+      const index = Math.round(value / width);
+      setSongIndex(index);
+    });
+  }, []);
+  const renderSongs = ({item, index}) => {
+    return (
+      <Animated.View style={style.mainImageWrapper}>
+        <View style={[style.imageWrapper, style.elevation]}>
+          <Image source={item.artwork} style={style.musicImage} />
+        </View>
+      </Animated.View>
+    );
+  };
   return (
     <SafeAreaView style={style.container}>
       <View style={style.mainContainer}>
-        <View style={[style.imageWrapper, style.elevation]}>
-          <Image
-            source={require('../../assets/img/img1.jpg')}
-            style={style.musicImage}
-          />
-        </View>
+        <Animated.FlatList
+          renderItem={renderSongs}
+          data={songs}
+          keyExtractor={item => item.id}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+            [
+              {
+                nativeEvent: {
+                  contentOffset: {
+                    x: scrollX,
+                  },
+                },
+              },
+            ],
+            {useNativeDriver: true},
+          )}
+        />
         <View>
-          <Text style={[style.songContent, style.songTitle]}>Title</Text>
-          <Text style={[style.songContent, style.artistName]}>Artist name</Text>
+          <Text style={[style.songContent, style.songTitle]}>
+            {songs[songIndex].title}
+          </Text>
+          <Text style={[style.songContent, style.artistName]}>
+            {songs[songIndex].artist}
+          </Text>
         </View>
         <View>
           <Slider
             style={style.progressBar}
             value={10}
             minimumValue={0}
-            maximumValue={1}
+            maximumValue={30}
             thumbTintColor={'#ffd369'}
             minimumTrackTintColor="#ffd369"
             maximumTrackTintColor="#fff"
@@ -49,8 +118,16 @@ const Home = () => {
             <Ionicons name="play-skip-back-outline" size={35} color="#ffd369" />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => {}}>
-            <Ionicons name="pause-circle" size={75} color="#ffd369" />
+          <TouchableOpacity onPress={() => togglePlayBack(playBackState)}>
+            <Ionicons
+              name={
+                playBackState === State.Playing
+                  ? 'ios-play-circle'
+                  : 'pause-circle'
+              }
+              size={75}
+              color="#ffd369"
+            />
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => {}}>
@@ -102,6 +179,13 @@ const style = StyleSheet.create({
     justifyContent: 'space-between',
     width: '80%',
   },
+
+  mainImageWrapper: {
+    width: width,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
   imageWrapper: {
     width: 300,
     height: 340,
